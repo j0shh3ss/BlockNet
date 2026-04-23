@@ -1,0 +1,9 @@
+{
+  "output": "events.jsonl",
+  "logs": [
+    {
+      "path": "/home/usr/tests/BlockNet/wed.log",
+      "server": "wed"
+    }
+  ]
+}
