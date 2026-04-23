@@ -42,13 +42,15 @@ def parse_line(line, server_id):
     for reason, pattern in PATTERNS.items():
         match = pattern.search(line)
         if match:
-            username = match.group(1) if match.groups() else "UNKNOWN"
+            port = match.group(2) if match.groups() else "UNKNOWN"
+            username = match.group(3) if match.groups() else "UNKNOWN"
 
             return {
                 "timestamp": timestamp,
                 "server": server_id,
                 "username": username,
                 "ip": ip,
+                "port": port,
                 "reason": reason
             }
 
