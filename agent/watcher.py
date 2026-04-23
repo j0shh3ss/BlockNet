@@ -9,7 +9,7 @@ CONFIG_FILE = "config.json"
 
 PATTERNS = {
     "not_whitelisted": re.compile(
-        r"Disconnecting\s+/\d+\.\d+\.\d+\.\d+:\d+:\s+(\w+).*\(You are not whitelisted\)"
+        r"Disconnecting\s+/(\d+\.\d+\.\d+\.\d+)(?::\d+)?:\s+(\w+).*\(You are not whitelisted\)"
     ),
     "failed_username": re.compile(
         r"Failed to verify username.*['\"]?(\w+)['\"]?"
@@ -87,9 +87,6 @@ def watch_logs():
     while True:
         for f, server_id in files:
             line = f.readline()
-
-            if line:
-                print("DEBUG LINE:", line.strip())
 
             if not line:
                 continue
