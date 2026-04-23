@@ -3,6 +3,8 @@ import json
 import time
 from datetime import datetime
 
+#Note to self: put patterns in config so user can add/customize
+
 CONFIG_FILE = "config.json"
 
 PATTERNS = {
