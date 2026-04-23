@@ -88,6 +88,9 @@ def watch_logs():
         for f, server_id in files:
             line = f.readline()
 
+            if line:
+                print("DEBUG LINE:", line.strip())
+
             if not line:
                 continue
 
