@@ -72,17 +72,18 @@ def write_event_sync(event, output_file):
 
 # Async wrapper for write_event_sync to be used in async contexts
 async def save_event_async(event, output_file):
-    loop = asyncio.get_event_loop()
+    loop = asyncio.running_loop()
     await loop.run_in_executor(None, write_event_sync, event, output_file)
 
 
 class LogHandler(FileSystemEventHandler):
     # Initialize with file path, server ID, output file, and queue
-    def __init__(self, path, server_id, output_file, queue):
+    def __init__(self, path, server_id, output_file, queue, loop):
         self.path = os.path.abspath(path)
         self.server_id = server_id
         self.output_file = output_file
         self.queue = queue
+        self.loop = loop
 
         self.file = open(self.path, "r")
         self.file.seek(0, 2)
@@ -145,7 +146,7 @@ async def async_main():
         server_id = log["server"]
     # Create log handler and schedule it
         try:
-            handler = LogHandler(path, server_id, output_file, queue)
+            handler = LogHandler(path, server_id, output_file, queue, loop)
             observer.schedule(handler, path=os.path.dirname(path), recursive=False)
             handlers.append(handler)
 
