@@ -1,12 +1,15 @@
 import re
 import json
 import time
+import os
+import asyncio
 from datetime import datetime
-
-#Note to self: put patterns in config so user can add/customize
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 CONFIG_FILE = "config.json"
 
+# Define regex patterns for different event types
 PATTERNS = {
     "not_whitelisted": re.compile(
         r"Disconnecting\s+/(\d+\.\d+\.\d+\.\d+)(?::(\d+))?\s+([^\s]+).*\(You are not whitelisted\)"
@@ -16,9 +19,10 @@ PATTERNS = {
     ),
 }
 
+# This pattern is used to extract the IP address from log lines, even if the line doesn't match the specific event patterns
 IP_PATTERN = re.compile(r"/(\d+\.\d+\.\d+\.\d+):\d+")
 
-
+# Load configuration from JSON file
 def load_config():
     try:
         with open(CONFIG_FILE) as f:
@@ -27,7 +31,7 @@ def load_config():
         print("❌ Failed to load config:", e)
         exit(1)
 
-
+# Parse a log line and extract event data if it matches known patterns
 def parse_line(line, server_id):
     time_match = re.match(r"\[(\d{2}:\d{2}:\d{2})\]", line)
     if not time_match:
@@ -38,9 +42,10 @@ def parse_line(line, server_id):
 
     ip_match = IP_PATTERN.search(line)
     ip = ip_match.group(1) if ip_match else None
-
+    # Check each pattern to see if the line matches a known event
     for reason, pattern in PATTERNS.items():
         match = pattern.search(line)
+        # If we have a match, extract the relevant data and return an event dict
         if match:
             port = match.group(2) if match.groups() else "UNKNOWN"
             username = match.group(3) if match.groups() else "UNKNOWN"
@@ -56,50 +61,118 @@ def parse_line(line, server_id):
 
     return None
 
-
-def save_event(event, output_file):
+# Asynchronously save event to output file
+async def save_event_async(event, output_file):
     try:
-        with open(output_file, "a") as f:
-            f.write(json.dumps(event) + "\n")
+        # Use run_in_executor to write to file without blocking the event loop
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(
+            None,
+            # Write to the output file in JSONL format (one JSON object per line)
+            lambda: open(output_file, "a").write(json.dumps(event) + "\n")
+        )
     except Exception as e:
         print("❌ Failed to write event:", e)
 
 
-def watch_logs():
+class LogHandler(FileSystemEventHandler):
+    # Initialize with file path, server ID, output file, and queue
+    def __init__(self, path, server_id, output_file, queue):
+        self.path = os.path.abspath(path)
+        self.server_id = server_id
+        self.output_file = output_file
+        self.queue = queue
+
+        self.file = open(self.path, "r")
+        self.file.seek(0, 2)
+
+        self.inode = os.fstat(self.file.fileno()).st_ino
+    # Check if file was rotated and reopen if needed
+    def _reopen_if_rotated(self):
+        try:
+            current_inode = os.stat(self.path).st_ino
+            # If inode changed, file was rotated
+            if current_inode != self.inode:
+                print(f"🔄 Log rotated for {self.server_id}, reopening...")
+                self.file.close()
+                self.file = open(self.path, "r")
+                self.inode = current_inode
+        except FileNotFoundError:
+            # File temporarily missing during rotation
+            pass
+    # Watchdog calls this on file modifications
+    def on_modified(self, event):
+        if os.path.abspath(event.src_path) != self.path:
+            return
+        # Check for log rotation
+        self._reopen_if_rotated()
+        # Read new lines and put them in the queue
+        for line in self.file:
+            asyncio.run_coroutine_threadsafe(
+                self.queue.put((line, self.server_id)),
+                asyncio.get_event_loop()
+            )
+
+# Worker task to process events from the queue
+async def process_events(queue, output_file):
+    while True:
+        line, server_id = await queue.get()
+    # Process the line and save event if found
+        event = parse_line(line, server_id)
+        if event:
+            print("🚨", event)
+            await save_event_async(event, output_file)
+
+        queue.task_done()
+
+
+async def async_main():
     config = load_config()
     output_file = config["output"]
+    # Create an asyncio queue to communicate between file handlers and worker tasks
+    queue = asyncio.Queue()
 
-    files = []
+    observer = Observer()
+    handlers = []
 
+    # Create log handlers based on config
     for log in config["logs"]:
+        path = log["path"]
+        server_id = log["server"]
+    # Create log handler and schedule it
         try:
-            f = open(log["path"], "r")
-            f.seek(0, 2)
-            files.append((f, log["server"]))
-            print(f"✅ Watching {log['server']} -> {log['path']}")
-        except Exception as e:
-            print(f"❌ Failed to open {log['path']}:", e)
+            handler = LogHandler(path, server_id, output_file, queue)
+            observer.schedule(handler, path=os.path.dirname(path), recursive=False)
+            handlers.append(handler)
 
-    if not files:
+            print(f"✅ Watching {server_id} -> {path}")
+        except Exception as e:
+            print(f"❌ Failed to watch {path}:", e)
+    # Check if we have any valid handlers
+    if not handlers:
         print("❌ No valid log files to watch.")
         exit(1)
 
-    print(f"👀 Watching {len(files)} log file(s)...")
+    print(f"👀 Watching {len(handlers)} log file(s)...")
 
-    while True:
-        for f, server_id in files:
-            line = f.readline()
+    observer.start()
+    # Start worker tasks to process events
+    workers = [asyncio.create_task(process_events(queue, output_file)) for _ in range(4)]
 
-            if not line:
-                continue
+    try:
+        while True:
+            await asyncio.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
 
-            event = parse_line(line, server_id)
+    observer.join()
 
-            if event:
-                print("🚨", event)
-                save_event(event, output_file)
+    for w in workers:
+        w.cancel()
 
-        time.sleep(0.05)
+# Entry point
+def watch_logs():
+    asyncio.run(async_main())
 
 
 if __name__ == "__main__":
