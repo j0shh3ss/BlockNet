@@ -61,18 +61,19 @@ def parse_line(line, server_id):
 
     return None
 
-# Asynchronously save event to output file
-async def save_event_async(event, output_file):
+# Safely write event to output file in JSONL format (one JSON object per line)
+def write_event_sync(event, output_file):
     try:
-        # Use run_in_executor to write to file without blocking the event loop
-        loop = asyncio.get_running_loop()
-        await loop.run_in_executor(
-            None,
-            # Write to the output file in JSONL format (one JSON object per line)
-            lambda: open(output_file, "a").write(json.dumps(event) + "\n")
-        )
+        with open(output_file, "a") as f:
+            f.write(json.dumps(event) + "\n")
     except Exception as e:
         print("❌ Failed to write event:", e)
+    
+
+# Async wrapper for write_event_sync to be used in async contexts
+async def save_event_async(event, output_file):
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, write_event_sync, event, output_file)
 
 
 class LogHandler(FileSystemEventHandler):
@@ -87,6 +88,7 @@ class LogHandler(FileSystemEventHandler):
         self.file.seek(0, 2)
 
         self.inode = os.fstat(self.file.fileno()).st_ino
+
     # Check if file was rotated and reopen if needed
     def _reopen_if_rotated(self):
         try:
@@ -100,6 +102,7 @@ class LogHandler(FileSystemEventHandler):
         except FileNotFoundError:
             # File temporarily missing during rotation
             pass
+
     # Watchdog calls this on file modifications
     def on_modified(self, event):
         if os.path.abspath(event.src_path) != self.path:
@@ -108,9 +111,9 @@ class LogHandler(FileSystemEventHandler):
         self._reopen_if_rotated()
         # Read new lines and put them in the queue
         for line in self.file:
-            asyncio.run_coroutine_threadsafe(
-                self.queue.put((line, self.server_id)),
-                asyncio.get_event_loop()
+            self.loop.call_soon_threadsafe(
+                self.queue.put_nowait,
+                (line, self.server_id)
             )
 
 # Worker task to process events from the queue
@@ -131,6 +134,7 @@ async def async_main():
     output_file = config["output"]
     # Create an asyncio queue to communicate between file handlers and worker tasks
     queue = asyncio.Queue()
+    loop = asyncio.get_running_loop()
 
     observer = Observer()
     handlers = []
