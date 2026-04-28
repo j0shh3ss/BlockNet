@@ -64,10 +64,14 @@ def parse_line(line, server_id):
 # Safely write event to output file in JSONL format (one JSON object per line)
 def write_event_sync(event, output_file):
     try:
+        # Ensure output directory exists
+        os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
         with open(output_file, "a") as f:
             f.write(json.dumps(event) + "\n")
+        print(f"✅ Event written to {output_file}")  # Add confirmation
     except Exception as e:
-        print("❌ Failed to write event:", e)
+        print(f"❌ Failed to write event to {output_file}: {e}")
+        raise  # Re-raise so executor captures it
     
 
 # Async wrapper for write_event_sync to be used in async contexts
