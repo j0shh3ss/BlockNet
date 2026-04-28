@@ -12,7 +12,7 @@ CONFIG_FILE = "config.json"
 # Define regex patterns for different event types
 PATTERNS = {
     "not_whitelisted": re.compile(
-        r"Disconnecting\s+/(\d+\.\d+\.\d+\.\d+)(?::(\d+))?\s+([^\s]+).*\(You are not whitelisted\)"
+        r"Disconnecting\s+(\d+\.\d+\.\d+\.\d+)(?::(\d+))?\s+([^\s]+).*\(You are not whitelisted\)"
     ),
     "failed_username": re.compile(
         r"Failed to verify username.*['\"]?(\w+)['\"]?"
