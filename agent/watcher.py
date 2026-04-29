@@ -76,7 +76,7 @@ def write_event_sync(event, output_file):
 
 # Async wrapper for write_event_sync to be used in async contexts
 async def save_event_async(event, output_file):
-    loop = asyncio.running_loop()
+    loop = asyncio.get_running_loop()
     await loop.run_in_executor(None, write_event_sync, event, output_file)
 
 
