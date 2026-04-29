@@ -20,7 +20,7 @@ PATTERNS = {
 }
 
 # This pattern is used to extract the IP address from log lines, even if the line doesn't match the specific event patterns
-IP_PATTERN = re.compile(r"/(\d+\.\d+\.\d+\.\d+):\d+")
+IP_PATTERN = re.compile(r"/(\d+\.\d+\.\d+\.\d+)\d+")
 
 # Load configuration from JSON file
 def load_config():
