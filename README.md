@@ -25,7 +25,7 @@ git clone https://github.com/j0shh3ss/BlockNet.git
 cd BlockNet
 cd agent
 ```
-Or web link: https://github.com/j0shh3ss/Minecraft-Backup-Manager/releases/latest
+Or web link: https://github.com/j0shh3ss/BlockNet/releases/latest
 ```
 wget https://github.com/j0shh3ss/BlockNet/archive/refs/tags/v1.0.tar.gz
 ```
