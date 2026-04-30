@@ -1,16 +1,76 @@
 # BlockNet
 A Python daemon that monitors server logs to detect and record unauthorized join attempts. By exporting this data in JSONL format, it builds a centralized log to help you analyze connection locations and identify malicious IPs that require broader network-level blocking.
 
-Currently there is no installer file due to possible user config editing (to add additional ignored/whitelisted players) so manual installation instructions listed below, assuming Ubuntu OS. Use AI to convert to whatever OS you are using.
+Currently there is no installer file due to possible user config editing (to add additional ignored/whitelisted players) so manual installation instructions listed in MODIFICATIONS, assuming Ubuntu OS. Use AI to convert to whatever OS you are using.
 
-# INSTALLER INSTRUCTIONS
+## INSTALLER INSTRUCTIONS
 
-## List of dependencies:
+### List of dependencies:
 > Python3 (Normally pre-installed, can verify with python3 --version)
 > WatchDog
 
-## To install dependencies (assuming Ubuntu)
+### To install dependencies (assuming Ubuntu)
 ```
 sudo apt install python3
 sudo apt install python3-watchdog
 ```
+### Installing BlockNet
+Click:
+**Code → Download ZIP**
+
+Or clone:
+```
+git clone https://github.com/j0shh3ss/BlockNet.git
+cd BlockNet
+cd agent
+```
+### Modifications
+DIR = BlockNet/agent
+```
+chmod +x watcher.py
+nano config.json
+```
+Please edit this file accordingly. Here is example:
+```
+{
+  "output": "events.jsonl",
+  "ignore_usernames": ["j0ssh3ss", "usr2"],
+  "logs": [
+    {
+      "path": "/mnt/server/minecraft/world/logs/latest.log",
+      "server": "world"
+    }, # must add comma for additional logs
+    {
+      "path": "/mnt/server/minecraft/other_world/logs/latest.log",
+      "server": "other_world"
+    } # I would add a comma here if I was gonna add a third log to monitor, since this is the last log to monitor, no comma.
+  ]
+}
+```
+In this example, I have added "j0ssh3ss" and usr2 as "ignored_usernames" these are users that will be ignored in event logging. In the "logs" section, you must direct the path to the designated path of your worlds latest.log file. You can keep adding more files to log as shown in other_world. Just add a comma "," after closing the bracket "}". You can also edit the "output" location by editing events.jsonl to be say /var/log/mc_watcher/events.jsonl but you must ensure write privledges match the user that will make the daemon service. For ease of use, I recommend keeping it in this folder.
+
+### Testing
+After modifications have been made, please run a test script. You will need 2 shells open in order to run this test.
+Shell 1:
+```
+python3 watcher.py
+```
+Shell 2 *NOTE* Please change the ending of these test scripts to match the directory of the log you want to test:
+```
+echo "[12:01:33] [Server thread/INFO]: Disconnecting /1.2.3.4:4525 Player123 (You are not whitelisted)" >> /mnt/server/minecraft/world/logs/latest.log
+echo "[12:01:33] [Server thread/INFO]: Disconnecting /1.2.3.4 Player123 (You are not whitelisted)" >> /mnt/server/minecraft/world/logs/latest.log
+echo "[14:44:22] [Server thread/INFO]: Player123 (/1.2.3.4:38328) lost connection: Disconnected" >> /mnt/server/minecraft/world/logs/latest.log
+```
+If you get these results, you pass ✅
+```
+🚨 {'timestamp': '2026-04-30T12:01:33', 'server': 'world', 'username': 'Player123', 'ip': '1.2.3.4', 'port': '4525', 'reason': 'not_whitelisted'}
+✅ Event written to events.jsonl
+🚨 {'timestamp': '2026-04-30T12:01:33', 'server': 'world', 'username': 'Player123', 'ip': '1.2.3.4', 'port': None, 'reason': 'not_whitelisted'}
+✅ Event written to events.jsonl
+🚨 {'timestamp': '2026-04-30T14:44:22', 'server': 'world', 'username': 'Player123', 'ip': '1.2.3.4', 'port': '38328', 'reason': 'lost_connection'}
+✅ Event written to events.jsonl
+```
+If you do not get these results, please check config file for accuracy, restart instructions if issue persists.
+
+### Creating Daemon Service for auto start/stop
+
