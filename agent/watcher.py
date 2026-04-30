@@ -17,6 +17,9 @@ PATTERNS = {
     "failed_username": re.compile(
         r"Failed to verify username.*['\"]?(\w+)['\"]?"
     ),
+    "lost_connection": re.compile(
+        r"([^\s]+)\s+\(/(\d+\.\d+\.\d+\.\d+):(\d+)\)\s+lost connection: (.+)"
+    ),
 }
 
 # This pattern is used to extract the IP address from log lines, even if the line doesn't match the specific event patterns
@@ -42,13 +45,22 @@ def parse_line(line, server_id):
 
     ip_match = IP_PATTERN.search(line)
     ip = ip_match.group(1) if ip_match else None
+
     # Check each pattern to see if the line matches a known event
     for reason, pattern in PATTERNS.items():
         match = pattern.search(line)
         # If we have a match, extract the relevant data and return an event dict
         if match:
-            port = match.group(2) if match.groups() else "UNKNOWN"
-            username = match.group(3) if match.groups() else "UNKNOWN"
+            if reason == "lost_connection":
+                username = match.group(1)
+                ip = match.group(2)
+                port = match.group(3)
+            elif reason == "failed_username":
+                username = match.group(1)
+                port = None
+            else:
+                port = match.group(2) if len(match.groups()) >= 2 else "UNKNOWN"
+                username = match.group(3) if len(match.groups()) >= 3 else "UNKNOWN"
 
             return {
                 "timestamp": timestamp,
@@ -122,16 +134,23 @@ class LogHandler(FileSystemEventHandler):
             )
 
 # Worker task to process events from the queue
-async def process_events(queue, output_file):
+async def process_events(queue, output_file, ignore_usernames):
     while True:
         line, server_id = await queue.get()
-    # Process the line and save event if found
-        event = parse_line(line, server_id)
-        if event:
-            print("🚨", event)
-            await save_event_async(event, output_file)
+        try:
+            event = parse_line(line, server_id)
+            if event:
+                # Skip trusted users for disconnect spam
+                if (
+                    event["reason"] == "lost_connection"
+                    and event["username"] in ignore_usernames
+                ):
+                    continue
 
-        queue.task_done()
+                print("🚨", event)
+                await save_event_async(event, output_file)
+        finally:
+            queue.task_done()
 
 
 async def async_main():
@@ -139,6 +158,7 @@ async def async_main():
     output_file = config["output"]
     # Create an asyncio queue to communicate between file handlers and worker tasks
     queue = asyncio.Queue()
+    ignore_usernames = set(config.get("ignore_usernames", []))
     loop = asyncio.get_running_loop()
 
     observer = Observer()
@@ -166,7 +186,10 @@ async def async_main():
 
     observer.start()
     # Start worker tasks to process events
-    workers = [asyncio.create_task(process_events(queue, output_file)) for _ in range(4)]
+    workers = [
+        asyncio.create_task(process_events(queue, output_file, ignore_usernames))
+        for _ in range(4)
+    ]
 
     try:
         while True:

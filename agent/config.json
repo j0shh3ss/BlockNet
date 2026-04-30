@@ -1,5 +1,6 @@
 {
   "output": "events.jsonl",
+  "ignore_usernames": ["whats1ttoya", "root"],
   "logs": [
     {
       "path": "/home/usr/tests/BlockNet/wed.log",
