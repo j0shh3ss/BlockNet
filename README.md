@@ -102,9 +102,9 @@ Restart=always
 WantedBy=multi-user.target
 ```
 Things needed to be changed:\
-User = *your ubuntu user*\
-WorkingDirectory = ex: /home/usr/BlockNet/agent (just needs to be the directory that watcher.py exists in)\
-ExecStart= ex:/usr/bin/python3 /home/usr/BlockNet/agent/watcher.py (this part needs to be the path to watcher.py, do not change /usr/bin/python3)\
+>User = *your ubuntu user*\
+>WorkingDirectory = ex: /home/usr/BlockNet/agent (just needs to be the directory that watcher.py exists in)\
+>ExecStart= ex:/usr/bin/python3 /home/usr/BlockNet/agent/watcher.py (this part needs to be the path to watcher.py, do not change /usr/bin/python3)
 ```
 sudo systemctl enable blocknet.service
 sudo systemctl start blocknet.service
