@@ -66,7 +66,7 @@ Shell 1:
 ```
 python3 watcher.py
 ```
-Shell 2 *NOTE* Please change the ending of these test scripts to match the directory of the log you want to test:
+Shell 2: *NOTE* Please change the ending of these test scripts to match the directory of the log you want to test, enter one at a time for ease
 ```
 echo "[12:01:33] [Server thread/INFO]: Disconnecting /1.2.3.4:4525 Player123 (You are not whitelisted)" >> /mnt/server/minecraft/world/logs/latest.log
 echo "[12:01:33] [Server thread/INFO]: Disconnecting /1.2.3.4 Player123 (You are not whitelisted)" >> /mnt/server/minecraft/world/logs/latest.log
