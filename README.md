@@ -15,7 +15,7 @@ sudo apt install python3
 sudo apt install python3-watchdog
 ```
 ---
-### Installing BlockNet
+### 📦 Installing BlockNet
 Click:
 **Code → Download ZIP**
 
@@ -26,7 +26,7 @@ cd BlockNet
 cd agent
 ```
 ---
-### Modifications
+## ⚙️ Modifications
 DIR = BlockNet/agent
 ```
 chmod +x watcher.py
@@ -52,7 +52,7 @@ Please edit this file accordingly. Here is example:
 In this example, I have added "j0ssh3ss" and usr2 as "ignored_usernames" these are users that will be ignored in event logging. In the "logs" section, you must direct the path to the designated path of your worlds latest.log file. You can keep adding more files to log as shown in other_world. Just add a comma "," after closing the bracket "}". You can also edit the "output" location by editing events.jsonl to be say /var/log/mc_watcher/events.jsonl but you must ensure write privledges match the user that will make the daemon service. For ease of use, I recommend keeping it in this folder.
 
 ---
-### Testing
+## 🧪 Testing
 After modifications have been made, please run a test script. You will need 2 shells open in order to run this test.
 Shell 1:
 ```
@@ -76,5 +76,5 @@ If you get these results, you pass ✅
 If you do not get these results, please check config file for accuracy, restart instructions if issue persists.
 
 ---
-### Creating Daemon Service for auto start/stop
+## ⏱️ Creating Daemon Service for auto start/stop
 
