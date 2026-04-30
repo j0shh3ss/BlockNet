@@ -15,7 +15,7 @@ sudo apt install python3
 sudo apt install python3-watchdog
 ```
 ---
-### 📦 Installing BlockNet
+## 📦 Installing BlockNet
 Click:
 **Code → Download ZIP**
 
