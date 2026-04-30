@@ -120,7 +120,6 @@ Output of last command should give something like this:
      Loaded: loaded (/etc/systemd/system/blocknet.service; enabled; preset: enabled)
      Active: active (exited)
 ```
----
 If you recieved above output. Install is complete and logging will persist until system daemon is stopped. You can check the output by navigating to /BlockNet/agent/events.jsonl after an event has posted. To test again, refer to step 3.
 ---
 ## 🚨 Uninstalling
