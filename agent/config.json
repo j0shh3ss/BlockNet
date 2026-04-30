@@ -1,10 +1,10 @@
 {
   "output": "events.jsonl",
-  "ignore_usernames": ["whats1ttoya", "root"],
+  "ignore_usernames": ["usr", "root"],
   "logs": [
     {
-      "path": "/home/usr/tests/BlockNet/wed.log",
-      "server": "wed"
+      "path": "/home/usr/BlockNet/world.log",
+      "server": "world"
     }
   ]
 }
