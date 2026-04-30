@@ -61,12 +61,12 @@ Please edit this file accordingly. Here is example:
 
 ---
 ## Step 3: 🧪 Testing
-After modifications have been made, please run a test script. You will need 2 shells open in order to run this test.
-Shell 1:
+After modifications have been made, please run a test script. You will need 2 shells open in order to run this test.\
+**Shell 1:**
 ```
 python3 watcher.py
 ```
-Shell 2: *NOTE* Please change the ending of these test scripts to match the directory of the log you want to test, enter one at a time for ease
+**Shell 2:** *NOTE* Please change the ending of these test scripts to match the directory of the log you want to test, enter one at a time for ease
 ```
 echo "[12:01:33] [Server thread/INFO]: Disconnecting /1.2.3.4:4525 Player123 (You are not whitelisted)" >> /mnt/server/minecraft/world/logs/latest.log
 echo "[12:01:33] [Server thread/INFO]: Disconnecting /1.2.3.4 Player123 (You are not whitelisted)" >> /mnt/server/minecraft/world/logs/latest.log
