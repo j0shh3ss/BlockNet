@@ -5,10 +5,12 @@ Currently there is no installer file due to possible user config editing (to add
 
 # INSTALLER INSTRUCTIONS
 
-# List of dependencies:
-Python3 (Normally pre-installed, can verify with python3 --version)
-WatchDog
+## List of dependencies:
+> Python3 (Normally pre-installed, can verify with python3 --version)
+> WatchDog
 
-# To install dependencies (assuming Ubuntu)
+## To install dependencies (assuming Ubuntu)
+```
 sudo apt install python3
 sudo apt install python3-watchdog
+```
