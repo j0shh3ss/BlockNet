@@ -6,8 +6,8 @@ Currently there is no installer file due to possible user config editing (to add
 ## INSTALLER INSTRUCTIONS
 
 ### List of dependencies:
->Python3 (Normally pre-installed, can verify with python3 --version)\
->WatchDog
+-Python3 (Normally pre-installed, can verify with python3 --version)\
+-WatchDog
 
 ### Install dependencies (assuming Ubuntu)
 ```
