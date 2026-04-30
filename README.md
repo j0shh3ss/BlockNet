@@ -54,10 +54,10 @@ Please edit this file accordingly. Here is example:
   ]
 }
 ```
-In this example, I have added "j0ssh3ss" and usr2 as "ignored_usernames" these are users that will be ignored in event logging.\
-In the "logs" section, you must direct the path to the designated path of your worlds latest.log file.\
-You can keep adding more files to log as shown in other_world. Just add a comma "," after closing the bracket "}".\
-You can also edit the "output" location by editing events.jsonl to be say /var/log/mc_watcher/events.jsonl but you must ensure write privledges match the user that will make the daemon service. For ease of use, I recommend keeping it in this folder.
+>In this example, I have added "j0ssh3ss" and usr2 as "ignored_usernames" these are users that will be ignored in event logging.\
+>In the "logs" section, you must direct the path to the designated path of your worlds latest.log file.\
+>You can keep adding more files to log as shown in other_world. Just add a comma "," after closing the bracket "}".\
+>You can also edit the "output" location by editing events.jsonl to be say /var/log/mc_watcher/events.jsonl but you must ensure write privledges match the user that will make the daemon service. For ease of use, I recommend keeping it in this folder.
 
 ---
 ## Step 3: 🧪 Testing
@@ -101,6 +101,7 @@ ExecStart=/usr/bin/python3 /path/to/watcher.py
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
+
 [Install]
 WantedBy=multi-user.target
 ```
