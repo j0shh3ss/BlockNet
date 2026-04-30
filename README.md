@@ -101,11 +101,11 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 ```
-Things needed to be changed:
-User = *your ubuntu user*
-WorkingDirectory = ex: /home/usr/BlockNet/agent (just needs to be the directory that watcher.py exists in)
-ExecStart= ex:/usr/bin/python3 /home/usr/BlockNet/agent/watcher.py (this part needs to be the path to watcher.py, do not change /usr/bin/python3)
-<ins> ** Next Steps:  (leaving nano editing) ** </ins>
+Things needed to be changed:\
+User = *your ubuntu user*\
+WorkingDirectory = ex: /home/usr/BlockNet/agent (just needs to be the directory that watcher.py exists in)\
+ExecStart= ex:/usr/bin/python3 /home/usr/BlockNet/agent/watcher.py (this part needs to be the path to watcher.py, do not change /usr/bin/python3)\
+<ins> ** Next Steps:  (leaving nano editing) </ins>
 control x
 y
 enter
