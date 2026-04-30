@@ -33,6 +33,8 @@ wget https://github.com/j0shh3ss/BlockNet/archive/refs/tags/v1.0.tar.gz
 ## Step 2: ⚙️ Modifications
 DIR = BlockNet/agent
 ```
+cd BlockNet
+cd agent
 nano config.json
 ```
 Please edit this file accordingly. Here is example:
