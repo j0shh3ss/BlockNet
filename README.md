@@ -1,7 +1,7 @@
 # BlockNet
 A Python daemon that monitors server logs to detect and record unauthorized join attempts. By exporting this data in JSONL format, it builds a centralized log to help you analyze connection locations and identify malicious IPs that require broader network-level blocking.
 
-Currently there is no installer file due to possible user config editing (to add additional ignored/whitelisted players) so manual installation instructions listed below, assuming Ubuntu OS. Use AI to convert to whatever OS you are using.
+Currently there is no installer file due to possible user config editing (to add additional ignored/whitelisted players) so manual configuration instructions listed below.
 
 ## INSTALLER INSTRUCTIONS
 
@@ -40,24 +40,24 @@ nano config.json
 Please edit this file accordingly. Here is example:
 ```
 {
-  "output": "events.jsonl",
-  "ignore_usernames": ["j0ssh3ss", "usr2"],
-  "logs": [
+  1️⃣"output": "events.jsonl",
+  2️⃣"ignore_usernames": ["j0ssh3ss", "usr2"],
+  3️⃣"logs": [
     {
       "path": "/mnt/server/minecraft/world/logs/latest.log",
       "server": "world"
-    }, # must add comma for additional logs
+    },4️⃣ # 🔔 Must add comma (immediately left of 4 emoji) if number of logs >= 2
     {
       "path": "/mnt/server/minecraft/other_world/logs/latest.log",
       "server": "other_world"
-    } # I would add a comma here if I was gonna add a third log to monitor, since this is the last log to monitor, no comma.
+    } 4️⃣# 🔔 I would add a comma here if I was gonna add a third log to monitor and so forth. Since this is the last log to monitor, no comma.
   ]
 }
 ```
->In this example, I have added "j0ssh3ss" and usr2 as "ignored_usernames" these are users that will be ignored in event logging.\
->In the "logs" section, you must direct the path to the designated path of your worlds latest.log file.\
->You can keep adding more files to log as shown in other_world. Just add a comma "," after closing the bracket "}".\
->You can also edit the "output" location by editing events.jsonl to be say /var/log/mc_watcher/events.jsonl but you must ensure write privledges match the user that will make the daemon service. For ease of use, I recommend keeping it in this folder.
+>1️⃣You can change the output of where central jsonl gets stored, but for ease of use, store in BlockNet dir.
+>2️⃣In this example, I have added "j0ssh3ss" and usr2 as "ignored_usernames" these are users that will be ignored in event logging.\
+>3️⃣In the "logs" section, you must direct the path to the designated path of your worlds latest.log file.\
+>4️⃣You can keep adding more files to log as shown in other_world. Just add a comma "," after closing the bracket "}".\
 
 ---
 ## Step 3: 🧪 Testing
@@ -120,7 +120,8 @@ Output of last command should give something like this:
      Loaded: loaded (/etc/systemd/system/blocknet.service; enabled; preset: enabled)
      Active: active (exited)
 ```
-If you recieved above output. Install is complete and logging will persist until system daemon is stopped. You can check the output by navigating to /BlockNet/agent/events.jsonl after an event has posted. To test again, refer to step 3.
+If you recieved above output. Install is complete and logging will persist until system daemon is stopped. You can check the output by navigating to /BlockNet/agent/events.jsonl after an event has posted.\
+Might as well run another test to post an event. Repeat step 3.
 
 ---
 ## 🚨 Uninstalling
