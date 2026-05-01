@@ -2,6 +2,12 @@
 A Python daemon that monitors server logs to detect and record unauthorized join attempts. By exporting this data in JSONL format, it builds a centralized log to help you analyze connection locations and identify malicious IPs that require broader network-level blocking.
 
 Currently there is no installer file due to possible user config editing (to add additional ignored/whitelisted players) so manual configuration instructions listed below.
+---
+## 👾 Features
+- Daemon Service (Auto start/stop on pc launch)
+- Watchdog implemented for better CPU usage
+- Multiple server log files simultaneously
+- Centralized logging of malicious ip's
 
 ## INSTALLER INSTRUCTIONS
 
@@ -54,10 +60,10 @@ Please edit this file accordingly. Here is example:
   ]
 }
 ```
->1️⃣You can change the output of where central jsonl gets stored, but for ease of use, store in BlockNet dir.
+>1️⃣You can change the output of where central jsonl gets stored, but for ease of use, store in BlockNet dir.\
 >2️⃣In this example, I have added "j0ssh3ss" and usr2 as "ignored_usernames" these are users that will be ignored in event logging.\
 >3️⃣In the "logs" section, you must direct the path to the designated path of your worlds latest.log file.\
->4️⃣You can keep adding more files to log as shown in other_world. Just add a comma "," after closing the bracket "}".\
+>4️⃣You can keep adding more files to log as shown in other_world. Just add a comma "," after closing the bracket "}".
 
 ---
 ## Step 3: 🧪 Testing
