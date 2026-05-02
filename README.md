@@ -1,6 +1,11 @@
 # BlockNet
 A Python daemon that monitors server logs to detect and record unauthorized join attempts. By exporting this data in JSONL format, it builds a centralized log to help you analyze connection locations and identify malicious IPs that require broader network-level blocking.
 
+### Currently working on:
+Adding a regex for [Server thread/INFO]: Disconnecting <PlayerName> [/IP:Port]: Multi-player multiplayer.unverified_username\
+fixing regex for [Server thread/INFO]: Disconnecting <PlayerName> [/IP:Port]: Failed to verify username!
+
+
 Currently there is no installer file due to possible user config editing (to add additional ignored/whitelisted players) so manual configuration instructions listed below.
 ## 👾 Features
 - Daemon Service (Auto start/stop on pc launch)
