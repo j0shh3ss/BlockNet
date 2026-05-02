@@ -14,6 +14,7 @@ PATTERNS = {
     "not_whitelisted": re.compile(
         r"Disconnecting\s+/(\d+\.\d+\.\d+\.\d+)(?::(\d+))?\s+([^\s]+).*\(You are not whitelisted\)"
     ),
+    #FIX FAILED USERNAME
     "failed_username": re.compile(
         r"Failed to verify username.*['\"]?(\w+)['\"]?"
     ),
