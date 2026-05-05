@@ -14,10 +14,13 @@ PATTERNS = {
     "not_whitelisted": re.compile(
         r"Disconnecting\s+/(\d+\.\d+\.\d+\.\d+)(?::(\d+))?\s+([^\s]+).*\(You are not whitelisted\)"
     ),
-    #FIX FAILED USERNAME
     "failed_username": re.compile(
-        r"Failed to verify username.*['\"]?(\w+)['\"]?"
+        r"Disconnecting\s+([^\s]+)\s+\[/(\d+\.\d+\.\d+\.\d+):(\d+)\]:\s+Failed to verify username!"
     ),
+    "unverified_username": re.compile(
+        r"Disconnecting\s+([^\s]+)\s+\[/(\d+\.\d+\.\d+\.\d+):(\d+)\]:\s+Multi-player multiplayer\.unverified_username"
+    ),
+
     "lost_connection": re.compile(
         r"([^\s]+)\s+\(/(\d+\.\d+\.\d+\.\d+):(\d+)\)\s+lost connection: (.+)"
     ),
@@ -56,9 +59,12 @@ def parse_line(line, server_id):
                 username = match.group(1)
                 ip = match.group(2)
                 port = match.group(3)
-            elif reason == "failed_username":
+
+            elif reason in ("failed_username", "unverified_username"):
                 username = match.group(1)
-                port = None
+                ip = match.group(2)
+                port = match.group(3)
+
             else:
                 port = match.group(2) if len(match.groups()) >= 2 else "UNKNOWN"
                 username = match.group(3) if len(match.groups()) >= 3 else "UNKNOWN"
